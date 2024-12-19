@@ -63,6 +63,7 @@ def loginView(request):
             else:
                 # show error message
                 messages.error(request, f"Oops! Username or Password is invalid. Please try again.")
+                print(f"Failed login attempt for username: {username}")  # Add this line for debugging
                 
         return render(request, 'registration/login.html')
 
