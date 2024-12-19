@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>MedicAid | Community Forum for People to Discuss Health Related Issue</title>
+    <title>MoviesForum| Pagina para postear cosas random</title>
 
     <meta name="description" content="Amdesk - Help Center HTML template for your digital products">
     <meta name="keywords" content="helpdesk, forum, template, HTML template, responsive, clean">
@@ -68,23 +68,21 @@
         <div class="container">
 
             <a href="{% url 'home' %}" class="dx-nav-logo">
-                <h2 class="text-white" style="margin-top:0px; padding-top:10px; margin-bottom:0;">MedicAid</h2>
+                <h2 class="text-white" style="margin-top:0px; padding-top:10px; margin-bottom:0;">MoviesForum</h2>
             </a>
 
             
             <button type="button" class="dx-navbar-burger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span style="color:white">Menu</span> </button>
             <div class="dropdown-menu">
                 <a class="dropdown-item" href="{% url 'home' %}">Home</a>
-                <a class="dropdown-item" href="{% url 'blog' %}">Blog</a>
-                <a class="dropdown-item" href="{% url 'user-post' %}">Post A Topic</a>
                 <div class="dropdown-divider"></div>
                 {% if user.is_authenticated %}
-                <a class="dropdown-item" href="{% url 'user-dashboard' %}">Dashboard</a>
-                <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
-                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                <a class="dropdown-item" href="{% url 'user-dashboard' %}">Menu Usuario</a>
+                <a class="dropdown-item" href="{% url 'profile' %}">Perfil</a>
+                <a class="dropdown-item" href="{% url 'logout' %}">Salir </a>
                 {% else %}
                 <a class="dropdown-item" href="{% url 'login' %}">Login</a>
-                <a class="dropdown-item" href="{% url 'register' %}">Register</a>
+                <a class="dropdown-item" href="{% url 'register' %}">Registrarse</a>
                 {% endif %}
             </div>
 
@@ -99,14 +97,10 @@
                         </a>
                         
                     </li>
-                    <li class="dx-drop-item">
-                        <a href="{% url 'blog' %}">
-                            Blog
-                        </a>
-                    </li>
+                    
                     <li class="dx-drop-item">
                         <a href="{% url 'user-post' %}">
-                            Post A Topic
+                            Postea un tema
                         </a>
                         
                     </li>
@@ -123,13 +117,13 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="dropdownSignin">
                                 <li>
-                                    <a href="{% url 'user-dashboard' %}">Dashboard</a>
+                                    <a href="{% url 'user-dashboard' %}">Menu Usuario</a>
                                 </li>
                                 <li>
-                                    <a href="{% url 'profile' %}">Profile</a>
+                                    <a href="{% url 'profile' %}">Perfil</a>
                                 </li>
                                 <li>
-                                    <a href="{% url 'logout' %}">Logout</a>
+                                    <a href="{% url 'logout' %}">Salir </a>
                                 </li>
                             </ul>
                         </div>

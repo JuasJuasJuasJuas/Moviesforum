@@ -5,7 +5,9 @@ from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 # importing messages
 from django.contrib import messages
-
+import os
+import uuid
+from django.conf import settings
 # Model Forms.
 from .forms import UserPostForm, AnswerForm
 # String module
@@ -14,7 +16,7 @@ from django.template.loader import render_to_string
 # Create your views here.
 
 def home(request):
-    user_posts = UserPost.objects.all()
+    user_posts = UserPost.objects.all().order_by('-date_created')
     
     # Display latest posts.
     latest_blogs = BlogPost.objects.order_by('-timestamp')[0:3]
@@ -30,51 +32,52 @@ def home(request):
 
 @login_required(login_url='login')
 def userPost(request):
-    # User Post form.
-    form = UserPostForm(request.POST or None)
+    form = UserPostForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST':
         if form.is_valid():
-            title = request.POST.get('title')
-            description = request.POST.get('description')
-            topic = UserPost.objects.create(title=title, author=request.user.author, description=description)
-            topic.save()
-            return redirect('home')
-    else:
-        form = UserPostForm()
+            user_post = form.save(commit=False)
+            user_post.author = request.user.author  # Assuming Author is linked with the User
+            user_post.save()
 
-    context = {'form':form}
+            messages.success(request, "Post created successfully!")
+            return redirect('home')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+
+    context = {'form': form}
     return render(request, 'user-post.html', context)
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def postTopic(request, pk):
-    # Get specific user post by id.
     post_topic = get_object_or_404(UserPost, pk=pk)
+    answers = Answer.objects.filter(user_post=post_topic)
+    answer_form = AnswerForm()
 
-    # Count Post View only for authenticated users
-    if request.user.is_authenticated:
-        TopicView.objects.get_or_create(user=request.user, user_post=post_topic)
-
-    # Get all answers of a specific post.
-    answers = Answer.objects.filter(user_post = post_topic)
-
-    # Answer form.
-    answer_form = AnswerForm(request.POST or None)
-    if request.method == "POST":
+    if request.method == "POST" and request.user.is_authenticated:
+        answer_form = AnswerForm(request.POST, request.FILES)
         if answer_form.is_valid():
-            content = request.POST.get('content')
-            # passing User Id & User Post Id to DB
-            ans = Answer.objects.create(user_post=post_topic, user=request.user, content=content)
-            ans.save()
+            answer = answer_form.save(commit=False)  # Very important: commit=False
+            answer.user_post = post_topic
+            answer.user = request.user
+            answer.save()  # Now save the object
+
             return HttpResponseRedirect(post_topic.get_absolute_url())
-    else:
-        answer_form = AnswerForm()
-    
+        else:
+            for error, error_list in answer_form.errors.items():
+                for message in error_list:
+                    messages.error(request, f"{error}: {message}")
+            return redirect(request.META.get('HTTP_REFERER'))
+    elif request.method == "POST" and not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to post a response.")
+        return redirect('login')
+
     context = {
-        'topic':post_topic,
-        'answers':answers,
-        'answer_form':answer_form,
-        
+        'topic': post_topic,
+        'answers': answers,
+        'answer_form': answer_form,
     }
     return render(request, 'topic-detail.html', context)
 
